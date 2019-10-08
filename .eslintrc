@@ -1,12 +1,12 @@
 {
   "rules": {
-    "semi": 0 
+    "semi": 0
   },
   "env": {
     "node": true
   },
   "parserOptions": {
-      "ecmaVersion": 6,
+      "ecmaVersion": "es2017",
       "sourceType": "module",
       "ecmaFeatures": {
       }
