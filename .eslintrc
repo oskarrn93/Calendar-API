@@ -1,8 +1,6 @@
 {
-  "extends": "standard",
-    "rules": {
-      "semi": 0
-      
+  "rules": {
+    "semi": 0 
   },
   "env": {
     "node": true
