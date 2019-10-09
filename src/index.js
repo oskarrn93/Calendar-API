@@ -47,8 +47,12 @@ app.set('json spaces', 2); // number of spaces for indentation
  * Express Middleware
  */
 
-app.use(cors())
+// The request handler must be the first middleware on the app
+if(SENTRY_DSN) {
+  app.use(Sentry.Handlers.requestHandler());
+}
 
+app.use(cors())
 
 //log incoming requests
 app.use(function (req, res, next) {
@@ -77,7 +81,7 @@ app.get("/test/error", (req, res, next) => {
 
   try {
     let error = new Error("test error")
-    error.statusCode = 418;
+    //error.statusCode = 418;
     throw error;
 
     res.status(200);
@@ -101,6 +105,11 @@ app.get('*', (req, res) => {
  * Express Error Handling Middleware
  */
 
+// The error handler must be before any other error middleware
+if(SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler());
+}
+
 //log error
 app.use(function (err, req, res, next) {
   logger.log("log error")
@@ -117,10 +126,18 @@ app.use(function (err, req, res, next) {
 
   res.status(err.statusCode)
 
-  res.json({ 
+  const result = { 
     status: "error",
-    message: err.message  
-  })
+    message: err.message,
+    sentry: ""
+  }
+
+  //append sentry reference if it exists
+  if(res.sentry) {
+    result.sentry = res.sentry
+  }
+
+  res.json(result)
 
   res.end()
 })
