@@ -19,6 +19,7 @@ services:
       - ./.env:/.env
       - ./config.env:/config.env
       - ./src/index.js:/index.js
+      - ./src/logger.js:/logger.js
     ports:
       - "8001:8001"
     command: bash -c "npm install && npm run dev:start"

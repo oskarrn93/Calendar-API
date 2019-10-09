@@ -3,17 +3,15 @@
 import dotenv from "dotenv"
 import express from "express"
 import cors from "cors"
+import {logger} from "./logger.js"
 
+dotenv.config() //read override env file
+dotenv.config({ path: 'config.env' }) //read env file
 
-dotenv.config() //read first custom env file for allowing overrides
-dotenv.config({ path: 'config.env' }) //then read standard env
-
-
-const app = express()
-
+const ENVIRONMENT = process.env.NODE_ENV || "development"
 const PORT = process.env.PORT || 8001
 
-
+const app = express()
 app.use(cors())
 
 app.get("/", function(req, res) {
