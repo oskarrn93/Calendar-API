@@ -1,6 +1,6 @@
 {
   "name": "calendar-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Calendar API for serving Football, NBA and CS",
   "main": "index.js",
   "scripts": {
