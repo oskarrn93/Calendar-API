@@ -37,6 +37,7 @@
     "@babel/node": "^7.6.3",
     "@babel/preset-env": "^7.6.3",
     "babel-node": "0.0.1-security",
+    "babel-preset-minify": "^0.5.1",
     "nodemon": "^1.19.3"
   }
 }
