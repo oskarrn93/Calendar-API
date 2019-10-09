@@ -10,6 +10,7 @@ services:
       - config.env
     environment:
       - PORT=8001
+      - NODE_ENV=development
     volumes:
       - ./node_modules/:/node_modules/
       - ./package.json:/package.json
