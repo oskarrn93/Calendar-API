@@ -1,0 +1,17 @@
+version: '3'
+services:
+  api:
+    image: node:12
+    container_name: api
+    build: .
+    network_mode: "host"
+    environment:
+      - PORT=8001
+    volumes:
+      - ./node_modules/:/node_modules/
+      - ./package.json:/package.json
+      - ./package-lock.json:/package-lock.json
+      - ./index.js:/index.js
+    ports:
+      - "8001:8001"
+    command: bash -c "npm install && nodejs index.js"
