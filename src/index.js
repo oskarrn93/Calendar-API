@@ -7,7 +7,7 @@ import dotenv from "dotenv"
 import express from "express"
 import cors from "cors"
 import {logger} from "./logger.js"
-
+const Sentry = require("@sentry/node");
 /**
  * Config
  */
@@ -21,6 +21,19 @@ dotenv.config({ path: 'config.env' }) //read env file
  */
 const ENVIRONMENT = process.env.NODE_ENV || "development"
 const PORT = process.env.PORT || 8001
+
+//SENTRY_DSN is defined in dotenv file
+const SENTRY_DSN = process.env.SENTRY_DSN
+
+
+/**
+ * Sentry
+ */
+
+if(SENTRY_DSN) {
+  Sentry.init({ dsn: SENTRY_DSN });
+}
+
 
 /**
  * Express
