@@ -1,10 +1,14 @@
 
 //Read environment config variables
-require('dotenv').config()
-require('dotenv').config({ path: 'config.env' })
+import dotenv from "dotenv"
+import express from "express"
+import cors from "cors"
 
-const express = require("express")
-const cors = require("cors")
+
+dotenv.config() //read first custom env file for allowing overrides
+dotenv.config({ path: 'config.env' }) //then read standard env
+
+
 const app = express()
 
 const PORT = process.env.PORT || 8001

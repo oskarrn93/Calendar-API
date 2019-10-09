@@ -5,8 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "babel-node -- ./index.js",
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules && rm -rf ./dist",
+    "build": "rm -rf ./dist && babel ./src/ --out-dir ./dist/",
+    "dev": "./node_modules/nodemon/bin/nodemon.js --exec babel-node -- ./src/index.js",
+    "dev:start": "nodemon --exec babel-node -- ./index.js",
+    "prod:start": "nodejs index.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +34,8 @@
     "@babel/cli": "^7.6.3",
     "@babel/core": "^7.6.3",
     "@babel/node": "^7.6.3",
-    "babel-node": "0.0.1-security"
+    "@babel/preset-env": "^7.6.3",
+    "babel-node": "0.0.1-security",
+    "nodemon": "^1.19.3"
   }
 }
