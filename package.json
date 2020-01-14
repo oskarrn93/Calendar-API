@@ -1,15 +1,13 @@
 {
   "name": "calendar-api",
+  "type": "module",
   "version": "1.0.1",
   "description": "Calendar API for serving Football, NBA and CS",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rm -rf node_modules && rm -rf ./dist",
-    "build": "rm -rf ./dist && babel ./src/ --out-dir ./dist/",
     "dev": "./node_modules/nodemon/bin/nodemon.js --exec babel-node -- ./src/index.js",
-    "dev:start": "nodemon --exec babel-node -- ./index.js",
-    "prod:start": "nodejs ./dist/index.js"
+    "start": "nodejs ./index.js"
   },
   "repository": {
     "type": "git",
@@ -26,19 +24,11 @@
   },
   "homepage": "https://github.com/oskarrn93/Calendar-API#readme",
   "dependencies": {
-    "@sentry/node": "^5.6.2",
+    "@sentry/node": "^5.11.0",
     "cors": "^2.8.5",
-    "dotenv": "^8.1.0",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "moment": "^2.24.0"
   },
-  "devDependencies": {
-    "@babel/cli": "^7.6.3",
-    "@babel/core": "^7.6.3",
-    "@babel/node": "^7.6.3",
-    "@babel/preset-env": "^7.6.3",
-    "babel-node": "0.0.1-security",
-    "babel-preset-minify": "^0.5.1",
-    "nodemon": "^1.19.3"
-  }
+  "devDependencies": {}
 }

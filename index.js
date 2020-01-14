@@ -7,7 +7,7 @@ import dotenv from "dotenv"
 import express from "express"
 import cors from "cors"
 import {logger} from "./logger.js"
-const Sentry = require("@sentry/node");
+import Sentry from "@sentry/node"
 /**
  * Config
  */
@@ -17,7 +17,7 @@ dotenv.config({ path: 'config.env' }) //read env file
 
 /**
  * Setup
- * 
+ *
  */
 const ENVIRONMENT = process.env.NODE_ENV || "development"
 const PORT = process.env.PORT || 8001
@@ -33,11 +33,14 @@ const SENTRY_DSN = process.env.SENTRY_DSN
 if(SENTRY_DSN) {
   Sentry.init({ dsn: SENTRY_DSN });
 }
+else {
+  console.log("No Sentry DSN configured")
+}
 
 
 /**
  * Express
- * 
+ *
  */
 const app = express()
 //app.set('json replacer', replacer); // property transformation rules
@@ -120,13 +123,13 @@ app.use(function (err, req, res, next) {
 //handle error
 app.use(function (err, req, res, next) {
   logger.log("handle error")
-  
+
   //if no error status code is set, default to 500
-  if (!err.statusCode) err.statusCode = 500; 
+  if (!err.statusCode) err.statusCode = 500;
 
   res.status(err.statusCode)
 
-  const result = { 
+  const result = {
     status: "error",
     message: err.message,
     sentry: ""
