@@ -2,13 +2,12 @@ import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import Sentry from '@sentry/node'
-// import { MongoClient } from 'mongodb'
 import { default as mongodb } from 'mongodb'
 
 import { logger } from './logger.js'
 
-dotenv.config() //read override env file
-dotenv.config({ path: 'config.env' }) //read env file
+dotenv.config() //read .env
+dotenv.config({ path: 'config.env' })
 
 //const ENVIRONMENT = process.env.NODE_ENV || "development"
 const PORT = process.env.PORT || 8001
@@ -118,7 +117,6 @@ app.use(function(err, req, res, next) {
 app.use(function(err, req, res, next) {
   logger.log('handle error')
 
-  //if no error status code is set, default to 500
   if (!err.statusCode) err.statusCode = 500
 
   res.status(err.statusCode)
@@ -129,7 +127,6 @@ app.use(function(err, req, res, next) {
     sentry: '',
   }
 
-  //append sentry reference if it exists
   if (res.sentry) {
     result.sentry = res.sentry
   }
