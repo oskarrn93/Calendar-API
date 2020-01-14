@@ -3,8 +3,15 @@ import express from 'express'
 import cors from 'cors'
 import Sentry from '@sentry/node'
 import { default as mongodb } from 'mongodb'
-
 import { logger } from './logger.js'
+import {
+  statusRoute,
+  rootRoute,
+  sentryDebugRoute,
+  testRoute,
+  nbaRoute,
+  catchAllRoute,
+} from './routes.js'
 
 dotenv.config() //read .env file (if it exists)
 dotenv.config({ path: 'config.env' })
@@ -68,63 +75,12 @@ app.use(function(req, res, next) {
  * Express Routes
  */
 
-app.get('/', (req, res) => {
-  res
-    .status(200)
-    .json({ status: 'ok' })
-    .end()
-})
-
-app.get('/status', (req, res) => {
-  res
-    .status(200)
-    .json({ status: 'ok' })
-    .end()
-})
-
-app.get('/sentry-debug', (req, res, next) => {
-  try {
-    throw new Error('test error')
-  } catch (error) {
-    logger.log('catched test error, calling next')
-    next(error)
-  }
-})
-
-app.get('/test', async (req, res, next) => {
-  const collection = db.collection('test')
-  try {
-    const result = await collection.find({}).toArray()
-
-    res
-      .status(200)
-      .json(result)
-      .end()
-  } catch (error) {
-    logger.log(error)
-    next(error)
-  }
-})
-
-app.get('/nba', async (req, res, next) => {
-  const collection = db.handler.collection('nba')
-  try {
-    const result = await collection.find({}).toArray()
-
-    res
-      .status(200)
-      .json(result)
-      .end()
-  } catch (error) {
-    logger.log(error)
-    next(error)
-  }
-})
-
-app.get('*', (req, res, next) => {
-  // res.status(404)json({ status: 'error' }).end()
-  next(new Error('Page not found'))
-})
+app.get('/', rootRoute)
+app.use('/status', statusRoute)
+app.get('/sentry-debug', sentryDebugRoute)
+app.get('/test', testRoute(db))
+app.get('/nba', nbaRoute(db))
+app.get('*', catchAllRoute)
 
 /**
  * Express Error Handling Middleware
