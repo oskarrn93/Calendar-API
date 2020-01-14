@@ -6,27 +6,25 @@ import { default as mongodb } from 'mongodb'
 
 import { logger } from './logger.js'
 
-dotenv.config() //read .env
+dotenv.config() //read .env file (if it exists)
 dotenv.config({ path: 'config.env' })
 
 //const ENVIRONMENT = process.env.NODE_ENV || "development"
 const PORT = process.env.PORT || 8001
-const SENTRY_DSN = process.env.SENTRY_DSN //SENTRY_DSN is defined in dotenv file
 
-const MONGODB_URL =
-  process.env.MONGODB_URL ||
-  `mongodb://process.env.${MONGODB_USERNAME}:${MONGODB_PASSWORD}localhost:27017/`
-const MONGODB_DBNAME = 'calendar-api'
+const db = {
+  dbName: 'calendar-api',
+  handler: null,
+  url: process.env.MONGODB_URL,
+}
 
-var db = null
-
-if (SENTRY_DSN) {
-  Sentry.init({ dsn: SENTRY_DSN })
+if (process.env.SENTRY_DSN) {
+  Sentry.init({ dsn: process.env.SENTRY_DSN })
 } else {
   console.log('No Sentry DSN configured')
 }
 
-const mongoclient = new mongodb.MongoClient(MONGODB_URL, {
+const mongoclient = new mongodb.MongoClient(db.url, {
   native_parser: true,
   useUnifiedTopology: true,
 })
@@ -38,7 +36,7 @@ const mongoclient = new mongodb.MongoClient(MONGODB_URL, {
 mongoclient.connect(async err => {
   if (err) throw err
 
-  db = mongoclient.db(MONGODB_DBNAME)
+  db.handler = mongoclient.db(db.dbName)
 
   app.listen(PORT, function() {
     logger.log(`Calendar API server listening on port ${PORT}`)
@@ -54,7 +52,7 @@ app.set('json spaces', 2) // number of spaces for indentation
  */
 
 // The request handler must be the first middleware on the app
-if (SENTRY_DSN) {
+if (process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.requestHandler())
 }
 
@@ -71,15 +69,17 @@ app.use(function(req, res, next) {
  */
 
 app.get('/', (req, res) => {
-  res.status(200)
-  res.json({ status: 'ok' })
-  res.end()
+  res
+    .status(200)
+    .json({ status: 'ok' })
+    .end()
 })
 
 app.get('/status', (req, res) => {
-  res.status(200)
-  res.json({ status: 'ok' })
-  res.end()
+  res
+    .status(200)
+    .json({ status: 'ok' })
+    .end()
 })
 
 app.get('/sentry-debug', (req, res, next) => {
@@ -106,10 +106,24 @@ app.get('/test', async (req, res, next) => {
   }
 })
 
-app.get('*', (req, res) => {
-  res.status(404)
-  res.json({ status: 'error' })
-  res.end()
+app.get('/nba', async (req, res, next) => {
+  const collection = db.handler.collection('nba')
+  try {
+    const result = await collection.find({}).toArray()
+
+    res
+      .status(200)
+      .json(result)
+      .end()
+  } catch (error) {
+    logger.log(error)
+    next(error)
+  }
+})
+
+app.get('*', (req, res, next) => {
+  // res.status(404)json({ status: 'error' }).end()
+  next(new Error('Page not found'))
 })
 
 /**
@@ -117,7 +131,7 @@ app.get('*', (req, res) => {
  */
 
 // The error handler must be before any other error middleware
-if (SENTRY_DSN) {
+if (process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.errorHandler())
 }
 
