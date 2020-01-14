@@ -1,64 +1,57 @@
-
-/**
- * Imports
- */
-
 import dotenv from "dotenv"
 import express from "express"
 import cors from "cors"
-import {logger} from "./logger.js"
 import Sentry from "@sentry/node"
-/**
- * Config
- */
+// import { MongoClient } from 'mongodb'
+import { default as mongodb } from "mongodb"
+
+import { logger } from "./logger.js"
 
 dotenv.config() //read override env file
-dotenv.config({ path: 'config.env' }) //read env file
+dotenv.config({ path: "config.env" }) //read env file
 
-/**
- * Setup
- *
- */
-const ENVIRONMENT = process.env.NODE_ENV || "development"
+
+//const ENVIRONMENT = process.env.NODE_ENV || "development"
 const PORT = process.env.PORT || 8001
 
-//SENTRY_DSN is defined in dotenv file
-const SENTRY_DSN = process.env.SENTRY_DSN
+
+const SENTRY_DSN = process.env.SENTRY_DSN //SENTRY_DSN is defined in dotenv file
+
+const MONGODB_URL =
+  process.env.MONGODB_URL ||
+  `mongodb://process.env.${MONGODB_USERNAME}:${MONGODB_PASSWORD}localhost:27017/`
+const MONGODB_DBNAME = "calendar-api"
 
 
-/**
- * Sentry
- */
-
-if(SENTRY_DSN) {
-  Sentry.init({ dsn: SENTRY_DSN });
-}
-else {
+if (SENTRY_DSN) {
+  Sentry.init({ dsn: SENTRY_DSN })
+} else {
   console.log("No Sentry DSN configured")
 }
 
 
-/**
- * Express
- *
- */
+const mongoclient = new mongodb.MongoClient(MONGODB_URL, {
+  native_parser: true,
+  useUnifiedTopology: true
+})
+
 const app = express()
-//app.set('json replacer', replacer); // property transformation rules
-app.set('json spaces', 2); // number of spaces for indentation
+//app.set('json replacer', replacer) // property transformation rules
+app.set("json spaces", 2) // number of spaces for indentation
 
 /**
  * Express Middleware
  */
 
 // The request handler must be the first middleware on the app
-if(SENTRY_DSN) {
-  app.use(Sentry.Handlers.requestHandler());
+if (SENTRY_DSN) {
+  app.use(Sentry.Handlers.requestHandler())
 }
 
 app.use(cors())
 
 //log incoming requests
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   logger.log(`route: ${req.url}`)
   next()
 })
@@ -68,64 +61,70 @@ app.use(function (req, res, next) {
  */
 
 app.get("/", (req, res) => {
-  res.status(200);
+  res.status(200)
   res.json({ status: "ok" })
   res.end()
 })
 
 app.get("/status", (req, res) => {
-  res.status(200);
+  res.status(200)
   res.json({ status: "ok" })
   res.end()
 })
 
-
-app.get("/test/error", (req, res, next) => {
-
+app.get("/sentry-debug", (req, res, next) => {
   try {
-    let error = new Error("test error")
-    //error.statusCode = 418;
-    throw error;
-
-    res.status(200);
-    res.json({ status: "ok" })
-    res.end()
-
-  } catch(error) {
+    throw new Error("test error")
+  } catch (error) {
     logger.log("catched test error, calling next")
     next(error)
   }
-
 })
 
-app.get('*', (req, res) => {
-  res.status(404);
+app.get("/test", (req, res) => {
+  mongoclient.connect(async err => {
+    if (err) throw err
+
+    const db = mongoclient.db(MONGODB_DBNAME)
+    const testCollection = db.collection("test")
+    const result = await testCollection.find({}).toArray()
+    console.log(result)
+
+    mongoclient.close()
+    res.status(200)
+    res.json(result)
+    res.end()
+  })
+})
+
+app.get("*", (req, res) => {
+  res.status(404)
   res.json({ status: "error" })
   res.end()
-});
+})
 
 /**
  * Express Error Handling Middleware
  */
 
 // The error handler must be before any other error middleware
-if(SENTRY_DSN) {
-  app.use(Sentry.Handlers.errorHandler());
+if (SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler())
 }
 
 //log error
-app.use(function (err, req, res, next) {
+app.use(function(err, req, res, next) {
   logger.log("log error")
   logger.error(err.stack)
   next(err)
 })
 
 //handle error
-app.use(function (err, req, res, next) {
+app.use(function(err, req, res, next) {
   logger.log("handle error")
 
   //if no error status code is set, default to 500
-  if (!err.statusCode) err.statusCode = 500;
+  if (!err.statusCode) err.statusCode = 500
 
   res.status(err.statusCode)
 
@@ -136,7 +135,7 @@ app.use(function (err, req, res, next) {
   }
 
   //append sentry reference if it exists
-  if(res.sentry) {
+  if (res.sentry) {
     result.sentry = res.sentry
   }
 
