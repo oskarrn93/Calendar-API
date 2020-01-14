@@ -18,6 +18,8 @@ const MONGODB_URL =
   `mongodb://process.env.${MONGODB_USERNAME}:${MONGODB_PASSWORD}localhost:27017/`
 const MONGODB_DBNAME = 'calendar-api'
 
+var db = null
+
 if (SENTRY_DSN) {
   Sentry.init({ dsn: SENTRY_DSN })
 } else {
@@ -27,6 +29,20 @@ if (SENTRY_DSN) {
 const mongoclient = new mongodb.MongoClient(MONGODB_URL, {
   native_parser: true,
   useUnifiedTopology: true,
+})
+
+/**
+ * Express Listen
+ */
+
+mongoclient.connect(async err => {
+  if (err) throw err
+
+  db = mongoclient.db(MONGODB_DBNAME)
+
+  app.listen(PORT, function() {
+    logger.log(`Calendar API server listening on port ${PORT}`)
+  })
 })
 
 const app = express()
@@ -75,20 +91,19 @@ app.get('/sentry-debug', (req, res, next) => {
   }
 })
 
-app.get('/test', (req, res) => {
-  mongoclient.connect(async err => {
-    if (err) throw err
+app.get('/test', async (req, res, next) => {
+  const collection = db.collection('test')
+  try {
+    const result = await collection.find({}).toArray()
 
-    const db = mongoclient.db(MONGODB_DBNAME)
-    const testCollection = db.collection('test')
-    const result = await testCollection.find({}).toArray()
-    console.log(result)
-
-    mongoclient.close()
-    res.status(200)
-    res.json(result)
-    res.end()
-  })
+    res
+      .status(200)
+      .json(result)
+      .end()
+  } catch (error) {
+    logger.log(error)
+    next(error)
+  }
 })
 
 app.get('*', (req, res) => {
@@ -134,12 +149,4 @@ app.use(function(err, req, res, next) {
   res.json(result)
 
   res.end()
-})
-
-/**
- * Express Listen
- */
-
-app.listen(PORT, function() {
-  logger.log(`Calendar API server listening on port ${PORT}`)
 })
