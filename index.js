@@ -17,7 +17,7 @@ dotenv.config({ path: 'config.env' })
 const PORT = process.env.PORT || 8001
 
 const db = {
-  dbName: 'calendar-api',
+  dbName: process.env.MONGODB_DBNAME,
   handler: null,
   url: process.env.MONGODB_URL,
 }
@@ -32,7 +32,6 @@ const mongoclient = new mongodb.MongoClient(db.url, {
   native_parser: true,
   useUnifiedTopology: true,
 })
-
 
 mongoclient.connect(async err => {
   if (err) throw err
