@@ -41,8 +41,8 @@ export const testRoute = db => async (req, res, next) => {
   }
 }
 
-export const nbaRoute = db => async (req, res, next) => {
-  const collection = db.handler.collection('nba')
+export const collectionRoute = (db, collectionName) => async (req, res, next) => {
+  const collection = db.handler.collection(collectionName)
   try {
     const result = await collection.find({}).toArray()
 
