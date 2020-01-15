@@ -47,3 +47,38 @@ export const getNBA = async db => {
     throw new Error(error)
   }
 }
+
+export const getFootball = async db => {
+  try {
+    const listOfGames = await getCollectionFromDatabase(db, 'football')
+    console.log('listOfGames', listOfGames)
+
+    const iCal = iCalGenerator({
+      domain: 'calendar.oskarrosen.com',
+      name: 'Football Games',
+      url: 'https://calendar.oskarrosen.com/football',
+      prodId: '//Oskar Rosen//Football Games//EN',
+      ttl: 3600,
+      timezone: 'Europe/Berlin',
+    })
+
+    listOfGames.forEach(element => {
+      if (isNaN(element.date)) return
+
+      const start = new Date(element.date)
+      const end = new Date(start.getTime() + TWO_HOURS_IN_MS)
+
+      iCal.createEvent({
+        start: start,
+        end: end,
+        summary: element.title,
+        description: element.channels,
+        uid: 'football-games-' + element._id,
+      })
+    })
+
+    return iCal
+  } catch (error) {
+    throw new Error(error)
+  }
+}

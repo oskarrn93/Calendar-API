@@ -1,5 +1,5 @@
 import { logger } from './logger.js'
-import { getNBA } from './util.js'
+import { getNBA, getFootball } from './util.js'
 
 export const rootRoute = (req, res) => {
   res
@@ -60,6 +60,19 @@ export const nbaRoute = db => async (req, res, next) => {
 
     res.setHeader('Content-type', 'application/octet-stream')
     res.setHeader('Content-disposition', 'attachment; filename=nba.ics')
+    res.send(result.toString().replace(/(?:\r\n)/g, '\n')).end()
+  } catch (error) {
+    logger.log(error)
+    next(error)
+  }
+}
+
+export const footballRoute = db => async (req, res, next) => {
+  try {
+    const result = await getFootball(db)
+
+    res.setHeader('Content-type', 'application/octet-stream')
+    res.setHeader('Content-disposition', 'attachment; filename=football.ics')
     res.send(result.toString().replace(/(?:\r\n)/g, '\n')).end()
   } catch (error) {
     logger.log(error)
