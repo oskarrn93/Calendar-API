@@ -24,8 +24,6 @@ services:
     network_mode: "host"
     environment:
       - MONGO_INITDB_DATABASE=calendar-api
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=password
       - MONGODB_USERNAME=root
       - MONGODB_PASSWORD=password
     ports:
