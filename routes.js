@@ -1,7 +1,5 @@
-import express from 'express'
 import { logger } from './logger.js'
-
-const router = express.Router()
+import { getNBA } from './util.js'
 
 export const rootRoute = (req, res) => {
   res
@@ -50,6 +48,19 @@ export const collectionRoute = (db, collectionName) => async (req, res, next) =>
       .status(200)
       .json(result)
       .end()
+  } catch (error) {
+    logger.log(error)
+    next(error)
+  }
+}
+
+export const nbaRoute = db => async (req, res, next) => {
+  try {
+    const result = await getNBA(db)
+
+    res.setHeader('Content-type', 'application/octet-stream')
+    res.setHeader('Content-disposition', 'attachment; filename=nba.ics')
+    res.send(result.toString().replace(/(?:\r\n)/g, '\n')).end()
   } catch (error) {
     logger.log(error)
     next(error)
