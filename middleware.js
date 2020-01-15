@@ -9,7 +9,7 @@ import {
   collectionRoute,
   nbaRoute,
   footballRoute,
-  catchAllRoute,
+  // catchAllRoute,
 } from './routes.js'
 
 /**
@@ -45,7 +45,7 @@ export const initExpressRoutes = (app, db) => {
   app.get('/debug/nba', collectionRoute(db, 'nba'))
   app.get('/debug/cs', collectionRoute(db, 'cs'))
   app.get('/debug/football', collectionRoute(db, 'football'))
-  app.get('*', catchAllRoute)
+  // app.get('*', catchAllRoute)
 }
 
 /**
