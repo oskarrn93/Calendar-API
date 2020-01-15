@@ -13,7 +13,7 @@ import {
 dotenv.config() //read .env file (if it exists)
 dotenv.config({ path: 'config.env' })
 
-//const ENVIRONMENT = process.env.NODE_ENV || "development"
+const ENVIRONMENT = process.env.NODE_ENV || 'development'
 const PORT = process.env.PORT || 8001
 
 const db = {
@@ -23,7 +23,7 @@ const db = {
 }
 
 if (process.env.SENTRY_DSN) {
-  Sentry.init({ dsn: process.env.SENTRY_DSN })
+  Sentry.init({ dsn: process.env.SENTRY_DSN, environment: ENVIRONMENT })
 } else {
   console.log('No Sentry DSN configured')
 }
