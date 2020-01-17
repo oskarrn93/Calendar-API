@@ -1,4 +1,5 @@
 import { default as iCalGenerator } from 'ical-generator'
+import { logger } from './logger.js'
 
 const ONE_HOUR_IN_MS = 3600000
 const TWO_HOURS_IN_MS = 7200000
