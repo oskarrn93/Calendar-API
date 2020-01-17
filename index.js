@@ -33,15 +33,19 @@ const mongoclient = new mongodb.MongoClient(db.url, {
   useUnifiedTopology: true,
 })
 
-mongoclient.connect(async err => {
-  if (err) throw err
+try {
+  mongoclient.connect(async err => {
+    if (err) throw err
 
-  db.handler = mongoclient.db(db.dbName)
+    db.handler = mongoclient.db(db.dbName)
 
-  app.listen(PORT, function() {
-    logger.log(`Calendar API server listening on port ${PORT}`)
+    app.listen(PORT, function() {
+      logger.log(`Calendar API server listening on port ${PORT}`)
+    })
   })
-})
+} catch (error) {
+  logger.log(error)
+}
 
 const app = express()
 //app.set('json replacer', replacer) // property transformation rules
