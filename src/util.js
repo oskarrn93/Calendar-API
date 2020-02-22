@@ -38,6 +38,34 @@ export const getNBA = async db => {
   return iCal
 }
 
+export const getCS = async db => {
+  const listOfGames = await getCollectionFromDatabase(db, 'cs')
+
+  const iCal = iCalGenerator({
+    domain: 'calendar.oskarrosen.com',
+    name: 'CS Games',
+    url: 'https://calendar.oskarrosen.com/cs',
+    prodId: '//Oskar Rosen//CS Games//EN',
+    ttl: 3600,
+    timezone: 'Europe/Berlin',
+  })
+
+  listOfGames.forEach(element => {
+    const startTime = new Date(element.startDate)
+    iCal.createEvent({
+      start: startTime,
+      end: new Date(startTime.getTime() + ONE_HOUR_IN_MS),
+      summary: element.team1 + ' - ' + element.team2,
+      description: element.team1 + ' - ' + element.team2,
+      location: element.location,
+      url: 'https://www.hltv.org/matches',
+      uid: 'cs-games-' + element._id,
+    })
+  })
+
+  return iCal
+}
+
 export const getFootball = async db => {
   const listOfGames = await getCollectionFromDatabase(db, 'football')
   console.log('listOfGames', listOfGames)

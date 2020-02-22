@@ -1,21 +1,14 @@
-version: "3"
+version: '3'
 services:
   api:
     image: node:13.6
-    network_mode: "host"
+    network_mode: 'host'
     env_file:
       - config.env
     environment:
       - NODE_ENV=development
     volumes:
-      # - ./node_modules/:/node_modules/
-      # - ./package.json:/package.json
-      # - ./package-lock.json:/package-lock.json
-      # - ./.babelrc:/.babelrc
-      # - ./config.env:/config.env
-      # - ./src/index.js:/index.js
-      # - ./src/logger.js:/logger.js
       - ./:/code/
     ports:
-      - "8001:8001"
-    command: bash -c "cd /code && npm run start"
+      - '8001:8001'
+    command: bash -c "cd /code && npm install && npm run dev"

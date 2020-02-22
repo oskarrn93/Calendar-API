@@ -8,6 +8,7 @@ import {
   testRoute,
   collectionRoute,
   nbaRoute,
+  csRoute,
   footballRoute,
   // catchAllRoute,
 } from './routes.js'
@@ -41,6 +42,7 @@ export const initExpressRoutes = (app, db) => {
   app.get('/sentry-debug', sentryDebugRoute)
   app.get('/test', testRoute(db))
   app.get('/nba', nbaRoute(db))
+  app.get('/cs', csRoute(db))
   app.get('/football', footballRoute(db))
   app.get('/debug/nba', collectionRoute(db, 'nba'))
   app.get('/debug/cs', collectionRoute(db, 'cs'))
