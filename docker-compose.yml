@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   api:
     image: node:13.6
@@ -19,14 +19,3 @@ services:
     ports:
       - "8001:8001"
     command: bash -c "cd /code && npm run start"
-  database:
-    image: mongo:4.0.14
-    network_mode: "host"
-    environment:
-      - MONGO_INITDB_DATABASE=calendar-api
-      - MONGODB_USERNAME=root
-      - MONGODB_PASSWORD=password
-    ports:
-      - "27017-27019:27017-27019"
-    volumes:
-      - ./db:/data/db
