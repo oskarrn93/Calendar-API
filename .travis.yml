@@ -8,7 +8,7 @@ node_js:
 #   - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
 #   - git tag $TRAVIS_TAG
 
-before_deploy:
+after_success:
   - git config --global user.email "${GIT_EMAIL}"
   - git config --global user.name "${GIT_NAME}"
   - export GIT_TAG=v1.0.$TRAVIS_BUILD_NUMBER
